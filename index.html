@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>八 4 班全景图</title>
+    <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            overflow: hidden;
+            background-color: #000;
+        }
+        
+        #panorama {
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        .top-controls {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 100;
+        }
+        
+        .top-controls .back-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .top-controls .back-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+        
+        .top-controls .title {
+            color: white;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        .top-controls .music-btn {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+        
+        .music-btn.playing {
+            animation: rotate 2s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .bottom-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 100;
+        }
+        
+        .share-btn {
+            background: rgba(52, 152, 219, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .share-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.5s ease, height 0.5s ease;
+        }
+        
+        .share-btn:hover::before {
+            width: 200px;
+            height: 200px;
+        }
+        
+        .share-btn:active {
+            background: rgba(41, 128, 185, 1);
+        }
+        
+        .view-count {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 12px;
+            z-index: 100;
+        }
+        
+        .glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            border-radius: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="panorama"></div>
+    
+    <div class="top-controls">
+        <button class="back-btn glass">返回</button>
+        <div class="title">八 4 班全景图</div>
+        <button class="music-btn glass" id="musicBtn">🎵</button>
+    </div>
+    
+    <div class="bottom-controls">
+        <button class="share-btn" id="shareBtn">下载当前视角照片</button>
+    </div>
+    
+    <a href="https://www.hitwebcounter.com/" target="_blank">
+    <div class="view-count">观看人数:</div>
+    <img src="https://hitwebcounter.com/counter/counter.php?page=21459106&style=0007&nbdigits=5&type=page&initCount=0" title="Free Tools" Alt="Free Tools"   border="0" /></a>
+    
+    <audio id="backgroundMusic" loop>
+        <source src="background-music.mp3" type="audio/mpeg">
+        您的浏览器不支持音频播放。
+    </audio>
+    
+    <script>
+        const viewer = pannellum.viewer('panorama', {
+            type: 'equirectangular',
+            panorama: 'classroom-panorama.jpg',
+            autoLoad: true,
+            controls: true,
+            mouseZoom: true,
+            touchZoom: true,
+            compass: false,
+            autoRotate: 0,
+            showFullscreenCtrl: false,
+            showZoomCtrl: false
+        });
+        
+        const musicBtn = document.getElementById('musicBtn');
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        
+        window.addEventListener('load', () => {
+            backgroundMusic.play().then(() => {
+                musicBtn.classList.add('playing');
+            }).catch(error => {
+                console.log('自动播放失败:', error);
+            });
+        });
+        
+        musicBtn.addEventListener('click', () => {
+            if (backgroundMusic.paused) {
+                backgroundMusic.play();
+                musicBtn.classList.add('playing');
+            } else {
+                backgroundMusic.pause();
+                musicBtn.classList.remove('playing');
+            }
+        });
+        
+        const viewCountElement = document.getElementById('viewCount');
+        let viewCount = 0;
+        
+        function updateViewCount() {
+            viewCount++;
+            viewCountElement.textContent = viewCount;
+        }
+        
+        updateViewCount();
+        
+        const shareBtn = document.getElementById('shareBtn');
+        
+        shareBtn.addEventListener('click', () => {
+            html2canvas(document.getElementById('panorama')).then(canvas => {
+                const imageURL = canvas.toDataURL('image/png');
+                
+                const link = document.createElement('a');
+                link.href = imageURL;
+                link.download = 'classroom-panorama-view.png';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                alert('已生成当前视角图片并开始下载');
+            });
+        });
+        
+        const backBtn = document.querySelector('.back-btn');
+        backBtn.addEventListener('click', () => {
+            window.history.back();
+        });
+    </script>
+</body>
+</html>
