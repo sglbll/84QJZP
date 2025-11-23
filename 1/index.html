@@ -25,6 +25,7 @@
             height: 100vh;
         }
         
+        /* 顶部控制栏 */
         .top-controls {
             position: absolute;
             top: 20px;
@@ -86,6 +87,7 @@
             to { transform: rotate(360deg); }
         }
         
+        /* 底部控制栏 */
         .bottom-controls {
             position: absolute;
             bottom: 20px;
@@ -135,6 +137,7 @@
             background: rgba(41, 128, 185, 1);
         }
         
+        /* 观看人数（HitWebCounter） */
         .view-count {
             position: absolute;
             bottom: 20px;
@@ -142,8 +145,18 @@
             color: rgba(255, 255, 255, 0.8);
             font-size: 12px;
             z-index: 100;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
         
+        /* 隐藏HitWebCounter默认的边框和背景 */
+        .hitwebcounter {
+            border: none !important;
+            background: transparent !important;
+        }
+        
+        /* 磨砂玻璃效果 */
         .glass {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(10px);
@@ -163,12 +176,21 @@
     </div>
     
     <div class="bottom-controls">
-        <button class="share-btn" id="shareBtn">下载当前视角照片</button>
+        <button class="share-btn" id="shareBtn">分享当前视角</button>
     </div>
     
-    <a href="https://www.hitwebcounter.com/" target="_blank">
-    <div class="view-count">观看人数:</div>
-    <img src="https://hitwebcounter.com/counter/counter.php?page=21459106&style=0007&nbdigits=5&type=page&initCount=0" title="Free Tools" Alt="Free Tools"   border="0" /></a>
+    <!-- HitWebCounter 在线计数器（淡白色、小尺寸） -->
+    <div class="view-count">
+        观看人数:
+        <a href="https://www.hitwebcounter.com" target="_blank">
+            <img src="https://hitwebcounter.com/counter/counter.php?page=21459109&style=0006&nbdigits=4&type=page&initCount=0" 
+                 alt="观看人数统计" 
+                 class="hitwebcounter" 
+                 border="0" 
+                 title="观看人数统计" 
+                 style="width: auto; height: 14px;">
+        </a>
+    </div>
     
     <audio id="backgroundMusic" loop>
         <source src="background-music.mp3" type="audio/mpeg">
@@ -176,9 +198,10 @@
     </audio>
     
     <script>
+        // 初始化全景图（已替换为你的网络图片链接）
         const viewer = pannellum.viewer('panorama', {
             type: 'equirectangular',
-            panorama: 'http://youke1.picui.cn/s1/2025/11/23/6922c23288ca3.jpg',
+            panorama: 'https://youke1.picui.cn/s1/2025/11/23/6922c23288ca3.jpg',
             autoLoad: true,
             controls: true,
             mouseZoom: true,
@@ -189,6 +212,7 @@
             showZoomCtrl: false
         });
         
+        // 音乐播放控制（自动播放）
         const musicBtn = document.getElementById('musicBtn');
         const backgroundMusic = document.getElementById('backgroundMusic');
         
@@ -196,7 +220,7 @@
             backgroundMusic.play().then(() => {
                 musicBtn.classList.add('playing');
             }).catch(error => {
-                console.log('自动播放失败:', error);
+                console.log('自动播放失败（浏览器限制），可手动点击音乐按钮播放:', error);
             });
         });
         
@@ -210,33 +234,22 @@
             }
         });
         
-        const viewCountElement = document.getElementById('viewCount');
-        let viewCount = 0;
-        
-        function updateViewCount() {
-            viewCount++;
-            viewCountElement.textContent = viewCount;
-        }
-        
-        updateViewCount();
-        
+        // 分享功能（下载当前视角图片）
         const shareBtn = document.getElementById('shareBtn');
-        
         shareBtn.addEventListener('click', () => {
             html2canvas(document.getElementById('panorama')).then(canvas => {
                 const imageURL = canvas.toDataURL('image/png');
-                
                 const link = document.createElement('a');
                 link.href = imageURL;
-                link.download = 'classroom-panorama-view.png';
+                link.download = '八4班全景图-当前视角.png';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
-                
-                alert('已生成当前视角图片并开始下载');
+                alert('当前视角图片已开始下载！');
             });
         });
         
+        // 返回按钮功能
         const backBtn = document.querySelector('.back-btn');
         backBtn.addEventListener('click', () => {
             window.history.back();
